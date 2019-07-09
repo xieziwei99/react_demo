@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// 函数组件
 function Square(props) {
     return (
         <button className="square" onClick={props.onClick}>
@@ -52,6 +53,7 @@ class Game extends React.Component {
           }],
           xIsNext: true,
           stepNumber: 0,
+          stepPlace: [],  // 在棋盘上落子位置（由0~8表示）
         };
     }
 
@@ -61,6 +63,8 @@ class Game extends React.Component {
         // const 声明常量，但仍可修改数组中的值
         // 调用了 .slice() 方法创建了 squares 数组的一个副本 [begin, end)
         const squares = current.squares.slice();
+        const stepPlace = this.state.stepPlace.slice();
+
         if (calculateWinner(squares) || squares[i]) {
             return;
         }
@@ -71,6 +75,7 @@ class Game extends React.Component {
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
+            stepPlace: stepPlace.concat([i]),
         });
     }
 
@@ -92,7 +97,11 @@ class Game extends React.Component {
         // 2. （可选）当前的索引
         // 3. （可选）调用的数组本身
         const moves = history.map((step, move) => {
-           const desc = move ? 'Go to move #' + move : 'Go to game start';
+           const desc = move
+               ? 'Go to move #' + move
+               + `(${Math.floor(this.state.stepPlace[move - 1] / 3)}, 
+               ${this.state.stepPlace[move - 1] % 3})`
+               : 'Go to game start';
            return (
              <li key={move}>
                  <button onClick={() => this.jumpTo(move)}>{desc}</button>
